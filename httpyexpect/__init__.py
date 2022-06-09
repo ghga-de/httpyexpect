@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An opinon on how to translate HTTP errors from server to the client side
-and the tools for the implement of that opinion."""
+"""An opinionated way to translate server side HTTP errors to the client side."""
 
 __version__ = "0.1.0"
