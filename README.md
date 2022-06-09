@@ -4,8 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ghga-de/httpyexpect/badge.svg?branch=main)](https://coveralls.io/github/ghga-de/httpyexpect?branch=main)
 
 # httpyexpect
-An opinon on how to translate HTTP errors from server to the client side and
-the tools for the implement of that opinion.
+An opinionated way to translate server side HTTP errors to the client side.
 
 # Installation
 This package is available at PyPI:
