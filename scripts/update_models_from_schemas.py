@@ -21,8 +21,8 @@ Updates pydantic models located in the MODELS_DIR generated from JSON schemas lo
 the SCHEMAS_DIR.
 """
 
-from pathlib import Path
 import subprocess
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import typer

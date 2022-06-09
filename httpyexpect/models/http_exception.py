@@ -16,15 +16,15 @@ class HttpException(BaseModel):
     class Config:
         extra = Extra.forbid
 
-    exceptionId: constr(regex=r'^[a-z][a-zA-Z0-9]{2,39}$') = Field(
+    exceptionId: constr(regex=r"^[a-z][a-zA-Z0-9]{2,39}$") = Field(
         ...,
-        description='A itendifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (an not from the client perspective). Needs to be camel case formatted and 3-40 character in length.',
+        description="A itendifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (an not from the client perspective). Needs to be camel case formatted and 3-40 character in length.",
     )
     description: str = Field(
         ...,
-        description='A human readable message to the client explaining the cause of the exception.',
+        description="A human readable message to the client explaining the cause of the exception.",
     )
     details: Dict[str, Any] = Field(
         ...,
-        description='An object containing further details on the exception cause in a machine readable way. Even though this general exception schema does not specify the internal shape of the details object, all exceptions with the same exceptionId should use the same set of properties. This object may be empty (in case no details are required)',
+        description="An object containing further details on the exception cause in a machine readable way. Even though this general exception schema does not specify the internal shape of the details object, all exceptions with the same exceptionId should use the same set of properties. This object may be empty (in case no details are required)",
     )
