@@ -16,10 +16,11 @@
 
 """Exception Base models used across all servers."""
 
-from httpyexpect.models.http_exception import HttpExceptionBody  # type: ignore
+from httpyexpect.base_exception import HttpyExpectError
+from httpyexpect.models import HTTPExceptionBody
 
 
-class HTTPException(Exception):
+class HTTPException(HttpyExpectError):
     """A generic exception model that can be translated into an HTTP response according
     to the httpyexpect exception schema.
     """
@@ -51,7 +52,7 @@ class HTTPException(Exception):
         self.status_code = status_code
 
         # prepare a body that is validated against the httpyexpect schema:
-        self.body = HttpExceptionBody(
+        self.body = HTTPExceptionBody(
             exceptionId=exception_id, description=description, data=data
         )
 

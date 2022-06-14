@@ -15,7 +15,7 @@
 
 """Test the base exception for servers."""
 
-from httpyexpect.models.http_exception import HttpExceptionBody  # type: ignore
+from httpyexpect.models import HTTPExceptionBody
 from httpyexpect.server import HTTPException
 
 
@@ -24,7 +24,7 @@ def test_httpexception():
 
     # example params for an http exception
     status_code = 400
-    body = HttpExceptionBody(
+    body = HTTPExceptionBody(
         exceptionId="testException",
         description="This is a test exception.",
         data={"test": "test"},
