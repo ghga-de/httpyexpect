@@ -24,6 +24,7 @@ tests/unit/__init__.py
 
 README.md
 setup.py
+.mypy.ini
 
 .static_files
 .mandatory_files

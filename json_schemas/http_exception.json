@@ -1,0 +1,28 @@
+{
+  "$id": "https://raw.githubusercontent.com/ghga-de/httpyexcept/main/json_schemas/http_exception.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An opinionated schema for the response body shipped with HTTP exception (non 2xx status codes).",
+  "properties": {
+    "data": {
+      "description": "An object containing further details on the exception cause in a machine readable way.  All exceptions with the same exceptionId should use the same set of properties here. This object may be empty (in case no data is required)",
+      "type": "object"
+    },
+    "description": {
+      "description": "A human readable message to the client explaining the cause of the exception.",
+      "type": "string"
+    },
+    "exceptionId": {
+      "description": "An identifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (and not from the client perspective). Needs to be camel case formatted and 3-40 character in length.",
+      "pattern": "^[a-z][a-zA-Z0-9]{2,39}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "exceptionId",
+    "description",
+    "data"
+  ],
+  "title": "HTTP Exception",
+  "type": "object"
+}

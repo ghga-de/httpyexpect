@@ -1,0 +1,16 @@
+name: Check pydantic models generated from JSON schemas
+
+on: push
+
+jobs:
+  check_pydantic_models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.2
+
+      - id: common
+        uses: ghga-de/gh-action-common@v1.0.2
+
+      - name: Check pydantic models
+        run: |
+          ./scripts/update_models_from_schemas.py --check

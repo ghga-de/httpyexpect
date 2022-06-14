@@ -24,7 +24,6 @@ scripts/README.md
 .gitignore
 .pre-commit-config.yaml
 .pylintrc
-.mypy.ini
 
 LICENSE
 requirements.txt
