@@ -16,7 +16,7 @@
 
 """A sub-package for creating and managing HTTP errors with a specific schema on the
 server side.
-
-Please note, the "server" extra of the package should be installed to use this
-functionality.
 """
+
+# shortcuts:
+from httpyexpect.server.exceptions import HTTPException  # noqa: F401
