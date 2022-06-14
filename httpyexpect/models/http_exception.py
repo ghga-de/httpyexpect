@@ -42,7 +42,7 @@ class HttpException(BaseModel):
 
     data: Dict[str, Any] = Field(
         ...,
-        description="An object containing further details on the exception cause in a machine readable way. Even though this general exception schema does not specify the internal shape of the details object, all exceptions with the same exceptionId should use the same set of properties. This object may be empty (in case no details are required)",
+        description="An object containing further details on the exception cause in a machine readable way.  All exceptions with the same exceptionId should use the same set of properties here. This object may be empty (in case no data is required)",
     )
     description: str = Field(
         ...,
