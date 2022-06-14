@@ -44,7 +44,7 @@ class HttpException(BaseModel):
         ...,
         description="A human readable message to the client explaining the cause of the exception.",
     )
-    details: Dict[str, Any] = Field(
+    data: Dict[str, Any] = Field(
         ...,
         description="An object containing further details on the exception cause in a machine readable way. Even though this general exception schema does not specify the internal shape of the details object, all exceptions with the same exceptionId should use the same set of properties. This object may be empty (in case no details are required)",
     )
