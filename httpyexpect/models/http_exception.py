@@ -50,5 +50,5 @@ class HttpException(BaseModel):
     )
     exceptionId: constr(regex=r"^[a-z][a-zA-Z0-9]{2,39}$") = Field(
         ...,
-        description="A itendifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (an not from the client perspective). Needs to be camel case formatted and 3-40 character in length.",
+        description="An identifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (and not from the client perspective). Needs to be camel case formatted and 3-40 character in length.",
     )
