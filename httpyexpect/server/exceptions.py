@@ -50,9 +50,9 @@ class HTTPException(Exception):
 
         self.status_code = status_code
 
-        # prepare a body that is validated against the httpyexcept schema:
+        # prepare a body that is validated against the httpyexpect schema:
         self.body = HttpExceptionBody(
-            exception_id=exception_id, description=description, data=data
+            exceptionId=exception_id, description=description, data=data
         )
 
         super().__init__(description)

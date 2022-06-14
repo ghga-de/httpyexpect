@@ -1,5 +1,5 @@
 {
-  "$id": "https://raw.githubusercontent.com/ghga-de/httpyexcept/main/json_schemas/http_exception_body.json",
+  "$id": "https://raw.githubusercontent.com/ghga-de/httpyexpect/main/json_schemas/http_exception_body.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "An opinionated schema for the response body shipped with HTTP exception (non 2xx status codes).",
