@@ -24,10 +24,14 @@ class HTTPException(Exception):
     to the httpyexpect exception schema.
     """
 
-    def __init__(self, *, exception_id: str, description: str, data: dict):
+    def __init__(
+        self, *, status_code: int, exception_id: str, description: str, data: dict
+    ):
         """Initialize the error with the required metadata.
 
         Args:
+            status_code:
+                The response code of the HTTP response to send.
             exception_id:
                 An identifier used to distinguish between different exception causes in
                 a preferably fine-grained fashion. The distinction between causes should
@@ -43,6 +47,8 @@ class HTTPException(Exception):
                 same set of properties here. This object may be empty (in case no data
                 is required)"
         """
+
+        self.status_code = status_code
 
         # prepare a body that is validated against the httpyexcept schema:
         self.body = HttpExceptionBody(
