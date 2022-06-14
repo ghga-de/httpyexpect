@@ -12,10 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-"""Test dummy."""
+"""A sub-package for creating and managing HTTP errors with a specific schema on the
+server side.
+"""
 
-
-def test_dummy():
-    """Just makes the CI pass."""
-    assert True
+# shortcuts:
+from httpyexpect.server.exceptions import HTTPException  # noqa: F401

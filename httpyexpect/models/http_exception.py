@@ -32,7 +32,7 @@ from typing import Any, Dict
 from pydantic import BaseModel, Extra, Field, constr
 
 
-class HttpException(BaseModel):
+class HttpExceptionBody(BaseModel):
     """
     An opinionated schema for the response body shipped with HTTP exception (non 2xx status codes).
     """
