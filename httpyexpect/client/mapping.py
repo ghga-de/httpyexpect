@@ -19,9 +19,10 @@ A exception mapping is a datastructure that maps an HTTP error response (4xx or 
 to a python exception.
 """
 
+from audioop import add
 import inspect
 import re
-from typing import Callable, Mapping, Optional
+from typing import Callable, Mapping, Optional, NamedTuple, Sequence, Literal
 
 from httpyexpect.client.exceptions import UnexpectedError, ValidationError
 from httpyexpect.models import EXCEPTION_ID_PATTERN
@@ -29,18 +30,28 @@ from httpyexpect.models import EXCEPTION_ID_PATTERN
 EXCEPTION_FACTORY_PARAMS = ("status_code", "exception_id", "description", "data")
 
 # Defining a type aliases for describing an exception mapping spec:
+ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "data"]
 StatusCode = int
 ExceptionId = str
 ExceptionFactory = Callable[..., Exception]
 ExceptionMappingSpec = Mapping[StatusCode, Mapping[ExceptionId, ExceptionFactory]]
 
 
+class FactoryKit(NamedTuple):
+    """A container for an exception factory plus instruction on which parameters
+    are required.
+    """
+
+    factory: ExceptionFactory
+    required_params: Sequence[ExceptionFactoryParam]
+
+
 class ExceptionMapping:
     """
     A datastructure that maps an HTTP response (4xx or 5xx) to a python exception.
     It will except a dict-based specification defining the mapping as input.
-    This spec will be validated and translated into a set of public attributes and
-    methods that helps to interact with this exception mapping.
+    This spec will be validated and public methods and public methods will be exposes
+    that simplify the interaction with the encoded exception mapping.
     """
 
     def __init__(
@@ -51,6 +62,16 @@ class ExceptionMapping:
     ):
         """
         Initialize with a dict-based specification of a exception mappings.
+
+        Args:
+            spec:
+                A dict-based specification defining the mapping between status codes
+                plus exception IDs on the one hand and python exceptions on the other.
+            fallback_factory:
+                An exception factory used when no matches where found using the spec.
+
+        Raises:
+            ValidationError: If the provided spec or fallback_factory are invalid.
         """
 
         self._spec = spec
@@ -102,15 +123,11 @@ class ExceptionMapping:
             )
 
     @staticmethod
-    def _check_exception_factory(
-        exception_factory: object,
-        *,
-        exception_id: Optional[str] = None,
-        status_code: Optional[int] = None,
-    ) -> None:
-        """Check the signature of an exception factory."""
-
-        error_intro = (
+    def _get_error_intro(
+        status_code: Optional[int] = None, exception_id: Optional[str] = None
+    ):
+        """Returns an intro for a ValidationError."""
+        return (
             (
                 "The exception factory provided for the exception id"
                 + f" {exception_id} within the status code {status_code}"
@@ -119,33 +136,27 @@ class ExceptionMapping:
             else "The provided exception factory"
         )
 
-        if not callable(exception_factory):
-            raise ValidationError(f"{error_intro} was not callable.")
+    @classmethod
+    def _inspect_factory_params(
+        cls,
+        factory: ExceptionFactory,
+        *,
+        exception_id: Optional[str] = None,
+        status_code: Optional[int] = None,
+    ) -> Sequence[ExceptionFactoryParam]:
+        """Inspect the parameters of the given factory.
+
+        Raises:
+            ValidationError: if parameters are invalid.
+
+        Returns:
+            A sequence of required parameters.
+        """
 
         try:
-            factory_signature = inspect.signature(exception_factory)
+            factory_signature = inspect.signature(factory)
         except ValueError:
-            factory_signature = inspect.signature(exception_factory.__call__)
-
-        # check for the expected paramters:
-        for param in factory_signature.parameters.values():
-            if param.kind in {
-                inspect.Parameter.VAR_POSITIONAL,
-                inspect.Parameter.VAR_KEYWORD,
-            }:
-                # ignoring variadic argument or keyword arguments (e.g. *args
-                # or **kwargs)
-                raise ValidationError(
-                    f"{error_intro} had variadic argument or keyword arguments (e.g. *args or"
-                    + " **kwargs) which are not allowed."
-                )
-
-            if param.name not in EXCEPTION_FACTORY_PARAMS:
-                raise ValidationError(
-                    f"{error_intro} has an unexpected parameter (expected one or"
-                    + f" multiple of [{','.join(EXCEPTION_FACTORY_PARAMS)}] in that"
-                    + f" order):{param.name}"
-                )
+            factory_signature = inspect.signature(factory.__call__)
 
         # check parameter order:
         observed_params = list(factory_signature.parameters.keys())
@@ -154,10 +165,55 @@ class ExceptionMapping:
         ]
         if observed_params != filtered_expected_params:
             raise ValidationError(
-                f"{error_intro} had the wrong order, expected"
-                + f" [{','.join(filtered_expected_params)}], but obtained:"
+                f"{cls._get_error_intro(status_code, exception_id)} had the wrong order,"
+                + " expected [{','.join(filtered_expected_params)}], but obtained:"
                 + f"[{','.join(observed_params)}]"
             )
+
+        # check additional paramters:
+        additional_params = set(EXCEPTION_FACTORY_PARAMS).difference(
+            set(observed_params)
+        )
+        for param in additional_params:
+            param_value = factory_signature.parameters[param]
+            if param_value.kind in {
+                inspect.Parameter.VAR_POSITIONAL,
+                inspect.Parameter.VAR_KEYWORD,
+            }:
+                raise ValidationError(
+                    f"{cls._get_error_intro(status_code, exception_id)} had variadic"
+                    + "argument or keyword arguments (e.g. *args or **kwargs) which are"
+                    + " not allowed."
+                )
+
+            raise ValidationError(
+                f"{cls._get_error_intro(status_code, exception_id)} has an"
+                + " unexpected parameter (expected one or multiple of"
+                + f" [{','.join(EXCEPTION_FACTORY_PARAMS)}] in that order):"
+                + param.name
+            )
+
+        # return required parameters:
+        return [param for param in observed_params if param not in additional_params]
+
+    @classmethod
+    def _check_exception_factory(
+        cls,
+        factory: object,
+        *,
+        exception_id: Optional[str] = None,
+        status_code: Optional[int] = None,
+    ) -> None:
+        """Check the signature of an exception factory."""
+
+        if not callable(factory):
+            raise ValidationError(
+                f"{cls._get_error_intro(status_code, exception_id)} was not callable."
+            )
+
+        cls._inspect_factory_params(
+            factory, exception_id=exception_id, status_code=status_code
+        )
 
     @classmethod
     def _validate(cls, spec: ExceptionMappingSpec):
@@ -178,3 +234,48 @@ class ExceptionMapping:
                     exception_id=exception_id,
                     status_code=status_code,
                 )
+
+    def _select_factory(
+        self, *, status_code: int, exception_id: str
+    ) -> ExceptionFactory:
+        """Selects and return an ExceptionFactory by providing mapping parameters:
+
+        Args:
+            status_code:
+                Must correspond to an HTTP error code (4xx or 5xx).
+            exception_id:
+                An identifier used to distinguish between different exception causes.
+
+        Raises:
+            ValidationError: If not passing an HTTP error code.
+        """
+        self._check_status_code(status_code)
+
+        try:
+            return self._spec[status_code][exception_id]
+        except KeyError:
+            return self._fallback_factory
+
+    def get_factory_kit(self, *, status_code: int, exception_id: str) -> FactoryKit:
+        """Obtain a FactoryKit by providing mapping parameters:
+
+        Args:
+            status_code:
+                Must correspond to an HTTP error code (4xx or 5xx).
+            exception_id:
+                An identifier used to distinguish between different exception causes.
+
+        Returns:
+            A FactoryKit.
+
+        Raises:
+            ValidationError: If not passing an HTTP error code.
+        """
+        factory = self._select_factory(
+            status_code=status_code, exception_id=exception_id
+        )
+        required_params = self._inspect_factory_params(
+            factory, status_code=status_code, exception_id=exception_id
+        )
+
+        return FactoryKit(factory=factory, required_params=required_params)

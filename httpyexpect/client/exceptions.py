@@ -28,7 +28,7 @@ class UnexpectedError(HttpyExpectError):
     Thrown when an HTTP error (originating from the server-side) could not be mapped
     using an ExceptionMapping (see the `mapping` module).
     (The HTTP error is, however, following the HttpyExceptionBody model as defined in
-    the exception.)
+    the `httpyexpect.models` module.)
     """
 
     def __init__(
@@ -62,5 +62,27 @@ class UnexpectedError(HttpyExpectError):
         message = (
             f"Unexpected error with ID {self.exception_id} and status code"
             + f"{self.status_code}: {self.description}"
+        )
+        super().__init__(message)
+
+
+class UnstructuredError(HttpyExpectError):
+    """
+    Thrown when an HTTP error (originating from the server-side) did not comply with
+    the HttpyExceptionBody model as defined in the `httpyexpect.models` module.
+    """
+
+    def __init__(self, status_code: int, body: str):
+        """Initialize the error with the required metadata.
+
+        Args:
+            status_code:
+                The response code of the HTTP response.
+            body:
+                The string representation of the body shipped with the response.
+        """
+        message = (
+            f"An error response with status code {status_code} was obtained of which"
+            + f"the body did not comply with the expected schema: {body}"
         )
         super().__init__(message)
