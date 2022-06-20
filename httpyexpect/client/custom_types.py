@@ -22,4 +22,4 @@ ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "d
 StatusCode = int
 ExceptionId = str
 ExceptionFactory = Callable[..., Exception]
-ExceptionMappingSpec = Mapping[StatusCode, Mapping[ExceptionId, ExceptionFactory]]
+ExceptionMappingSpec = Mapping[StatusCode, object]

@@ -20,11 +20,12 @@ to a python exception.
 """
 
 import inspect
-from typing import Mapping, NamedTuple, Optional, Sequence, cast
+from typing import Any, Mapping, NamedTuple, Optional, Sequence, cast
 
 from httpyexpect.client.custom_types import (
     ExceptionFactory,
     ExceptionFactoryParam,
+    ExceptionId,
     ExceptionMappingSpec,
 )
 from httpyexpect.client.exceptions import UnexpectedError
@@ -74,7 +75,7 @@ class ExceptionMapping:
             ValidationError: If the provided spec or fallback_factory are invalid.
         """
 
-        self._spec = spec
+        self._spec: Any = spec
         self._fallback_factory = fallback_factory
 
         self._validate(self._spec)
@@ -208,6 +209,7 @@ class ExceptionMapping:
         for status_code, exc_id_mapping in spec.items():
             assert_error_code(status_code)
             cls._check_exception_id_mapping(exc_id_mapping, status_code=status_code)
+            exc_id_mapping = cast(Mapping[ExceptionId, Any], exc_id_mapping)
 
             for exception_id, exception_factory in exc_id_mapping.items():
                 validate_exception_id(exception_id, status_code=status_code)
