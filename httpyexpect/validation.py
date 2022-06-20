@@ -28,7 +28,7 @@ class ValidationError(HttpyExpectError):
     """Thrown when a exception mapping spec failed validation."""
 
 
-def check_status_code(status_code: object) -> None:
+def assert_error_code(status_code: object) -> None:
     """Check that the provided status code corresponds to a valid error code."""
     if not isinstance(status_code, int) or not 400 <= status_code < 600:
         raise ValidationError(
@@ -37,7 +37,7 @@ def check_status_code(status_code: object) -> None:
         )
 
 
-def check_exception_id(
+def validate_exception_id(
     exception_id: object,
     *,
     status_code: Optional[int] = None,

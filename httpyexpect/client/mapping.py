@@ -30,8 +30,8 @@ from httpyexpect.client.custom_types import (
 from httpyexpect.client.exceptions import UnexpectedError
 from httpyexpect.validation import (
     ValidationError,
-    check_exception_id,
-    check_status_code,
+    assert_error_code,
+    validate_exception_id,
 )
 
 EXCEPTION_FACTORY_PARAMS = ("status_code", "exception_id", "description", "data")
@@ -206,11 +206,11 @@ class ExceptionMapping:
             ValidationError: if validation fails.
         """
         for status_code, exc_id_mapping in spec.items():
-            check_status_code(status_code)
+            assert_error_code(status_code)
             cls._check_exception_id_mapping(exc_id_mapping, status_code=status_code)
 
             for exception_id, exception_factory in exc_id_mapping.items():
-                check_exception_id(exception_id, status_code=status_code)
+                validate_exception_id(exception_id, status_code=status_code)
                 cls._check_exception_factory(
                     exception_factory,
                     exception_id=exception_id,
@@ -231,7 +231,7 @@ class ExceptionMapping:
         Raises:
             ValidationError: If not passing an HTTP error code.
         """
-        check_status_code(status_code)
+        assert_error_code(status_code)
 
         try:
             return self._spec[status_code][exception_id]

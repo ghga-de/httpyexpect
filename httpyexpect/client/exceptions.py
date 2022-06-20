@@ -28,7 +28,7 @@ class UnexpectedError(HttpyExpectError):
     """
 
     def __init__(
-        self, status_code: int, exception_id: str, description: str, data: dict
+        self, *, status_code: int, exception_id: str, description: str, data: dict
     ):
         """Initialize the error with the required metadata.
 
@@ -68,7 +68,7 @@ class UnstructuredError(HttpyExpectError):
     the HttpyExceptionBody model as defined in the `httpyexpect.models` module.
     """
 
-    def __init__(self, status_code: int, body: str):
+    def __init__(self, *, status_code: int, body: str):
         """Initialize the error with the required metadata.
 
         Args:
@@ -77,8 +77,11 @@ class UnstructuredError(HttpyExpectError):
             body:
                 The string representation of the body shipped with the response.
         """
+        self.status_code = status_code
+        self.body = body
+
         message = (
-            f"An error response with status code {status_code} was obtained of which"
-            + f"the body did not comply with the expected schema: {body}"
+            f"An error response with status code {self.status_code} was obtained of"
+            + f" which the body did not comply with the expected schema: {self.body}"
         )
         super().__init__(message)

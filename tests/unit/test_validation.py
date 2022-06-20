@@ -22,8 +22,8 @@ import pytest
 
 from httpyexpect.validation import (
     ValidationError,
-    check_exception_id,
-    check_status_code,
+    assert_error_code,
+    validate_exception_id,
 )
 
 
@@ -46,7 +46,7 @@ def test_check_status_code(status_code: object, is_valid: bool):
     """Test the `check_status_code` function."""
 
     with nullcontext() if is_valid else pytest.raises(ValidationError):  # type: ignore
-        check_status_code(status_code)
+        assert_error_code(status_code)
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_check_exception_id(exception_id: object, is_valid: bool):
     """Test the `check_exception_id` function."""
 
     with nullcontext() if is_valid else pytest.raises(ValidationError):  # type: ignore
-        check_exception_id(exception_id)
+        validate_exception_id(exception_id)
 
 
 def test_check_exception_id_status_code():
@@ -71,7 +71,7 @@ def test_check_exception_id_status_code():
     status_code = 432
 
     with pytest.raises(ValidationError) as error:
-        check_exception_id("123myInvalidExceptionId", status_code=status_code)
+        validate_exception_id("123myInvalidExceptionId", status_code=status_code)
 
     # Make sure the status code is mentioned in the error message:
     assert str(status_code) in str(error.value)
