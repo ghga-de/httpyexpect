@@ -19,10 +19,6 @@
 from httpyexpect.base_exception import HttpyExpectError
 
 
-class ValidationError(HttpyExpectError):
-    """Thrown when a exception mapping spec failed validation."""
-
-
 class UnexpectedError(HttpyExpectError):
     """
     Thrown when an HTTP error (originating from the server-side) could not be mapped

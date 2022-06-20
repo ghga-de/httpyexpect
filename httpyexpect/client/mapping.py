@@ -19,22 +19,22 @@ A exception mapping is a datastructure that maps an HTTP error response (4xx or 
 to a python exception.
 """
 
-from audioop import add
 import inspect
-import re
-from typing import Callable, Mapping, Optional, NamedTuple, Sequence, Literal
+from typing import Mapping, NamedTuple, Optional, Sequence, cast
 
-from httpyexpect.client.exceptions import UnexpectedError, ValidationError
-from httpyexpect.models import EXCEPTION_ID_PATTERN
+from httpyexpect.client.custom_types import (
+    ExceptionFactory,
+    ExceptionFactoryParam,
+    ExceptionMappingSpec,
+)
+from httpyexpect.client.exceptions import UnexpectedError
+from httpyexpect.validation import (
+    ValidationError,
+    check_exception_id,
+    check_status_code,
+)
 
 EXCEPTION_FACTORY_PARAMS = ("status_code", "exception_id", "description", "data")
-
-# Defining a type aliases for describing an exception mapping spec:
-ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "data"]
-StatusCode = int
-ExceptionId = str
-ExceptionFactory = Callable[..., Exception]
-ExceptionMappingSpec = Mapping[StatusCode, Mapping[ExceptionId, ExceptionFactory]]
 
 
 class FactoryKit(NamedTuple):
@@ -84,15 +84,6 @@ class ExceptionMapping:
             raise ValidationError("Invalid fallback factory.") from error
 
     @staticmethod
-    def _check_status_code(status_code: object) -> None:
-        """Check that the provided status code corresponds to a valid error code."""
-        if not isinstance(status_code, int) or not 400 <= status_code < 600:
-            raise ValidationError(
-                "The status codes must correspond to HTTP exception (4xx or 5xx),"
-                + f" obtained: {status_code}"
-            )
-
-    @staticmethod
     def _check_exception_id_mapping(
         exc_id_mapping: object,
         *,
@@ -102,31 +93,19 @@ class ExceptionMapping:
         Mapping."""
         if not isinstance(exc_id_mapping, Mapping):
             raise ValidationError(
-                f"The value provided for the {status_code} status code was not a"
-                + " dict (or python Mapping-compatible)."
-            )
-
-    @staticmethod
-    def _check_exception_id(
-        exception_id: object,
-        *,
-        status_code: int,
-    ) -> None:
-        """Check the format of an exception id."""
-        if not isinstance(exception_id, str) or not re.match(
-            EXCEPTION_ID_PATTERN, exception_id
-        ):
-            raise ValidationError(
-                "The exception ID must be a string formatted according to the regex"
-                + f"{EXCEPTION_ID_PATTERN}, however, for the status code {status_code},"
-                + f" the following was obtained: {exception_id}"
+                f"The mapping provided for the {status_code} status code was not a"
+                + " dict (or python Mapping-compatible datastructure)."
             )
 
     @staticmethod
     def _get_error_intro(
         status_code: Optional[int] = None, exception_id: Optional[str] = None
     ):
-        """Returns an intro for a ValidationError."""
+        """Returns an intro for a ValidationError.
+
+        To be used only by the `inspect_factory_params` and the `check_exception_factory`
+        functions.
+        """
         return (
             (
                 "The exception factory provided for the exception id"
@@ -156,7 +135,7 @@ class ExceptionMapping:
         try:
             factory_signature = inspect.signature(factory)
         except ValueError:
-            factory_signature = inspect.signature(factory.__call__)
+            factory_signature = inspect.signature(factory.__call__)  # type: ignore
 
         # check parameter order:
         observed_params = list(factory_signature.parameters.keys())
@@ -171,9 +150,9 @@ class ExceptionMapping:
             )
 
         # check additional paramters:
-        additional_params = set(EXCEPTION_FACTORY_PARAMS).difference(
-            set(observed_params)
-        )
+        additional_params = [
+            param for param in observed_params if param not in EXCEPTION_FACTORY_PARAMS
+        ]
         for param in additional_params:
             param_value = factory_signature.parameters[param]
             if param_value.kind in {
@@ -190,11 +169,14 @@ class ExceptionMapping:
                 f"{cls._get_error_intro(status_code, exception_id)} has an"
                 + " unexpected parameter (expected one or multiple of"
                 + f" [{','.join(EXCEPTION_FACTORY_PARAMS)}] in that order):"
-                + param.name
+                + param
             )
 
         # return required parameters:
-        return [param for param in observed_params if param not in additional_params]
+        return cast(
+            list[ExceptionFactoryParam],
+            [param for param in observed_params if param in EXCEPTION_FACTORY_PARAMS],
+        )
 
     @classmethod
     def _check_exception_factory(
@@ -224,11 +206,11 @@ class ExceptionMapping:
             ValidationError: if validation fails.
         """
         for status_code, exc_id_mapping in spec.items():
-            cls._check_status_code(status_code)
+            check_status_code(status_code)
             cls._check_exception_id_mapping(exc_id_mapping, status_code=status_code)
 
             for exception_id, exception_factory in exc_id_mapping.items():
-                cls._check_exception_id(exception_id, status_code=status_code)
+                check_exception_id(exception_id, status_code=status_code)
                 cls._check_exception_factory(
                     exception_factory,
                     exception_id=exception_id,
@@ -249,7 +231,7 @@ class ExceptionMapping:
         Raises:
             ValidationError: If not passing an HTTP error code.
         """
-        self._check_status_code(status_code)
+        check_status_code(status_code)
 
         try:
             return self._spec[status_code][exception_id]

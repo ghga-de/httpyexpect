@@ -19,6 +19,7 @@
 from typing import Optional
 
 import requests
+
 from httpyexpect.client.mapping import ExceptionMapping
 
 
@@ -42,6 +43,8 @@ class ResponseTranslator:
 
     def _validate_response(self, response: requests.Response):
         """Validates a response according to the"""
+        print(response)
+        return response
 
     def get_error(self, *, response: requests.Response) -> Optional[Exception]:
         """In case the provided response corresponds to an error, it will translated
@@ -55,4 +58,5 @@ class ResponseTranslator:
         Returns:
             A python exception in case of an HTTP error, `None` otherwise.
         """
-        ...
+        print(response)
+        return response

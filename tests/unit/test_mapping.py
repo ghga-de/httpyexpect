@@ -14,17 +14,18 @@
 # limitations under the License.
 #
 
-"""Test the exception_mapping module."""
+"""Test the mapping module."""
 
 from contextlib import nullcontext
 
 import pytest
 
-from httpyexpect.client.mapping import (
-    ExceptionMapping,
+from httpyexpect.client.custom_types import (
+    ExceptionFactory,
+    ExceptionFactoryParam,
     ExceptionMappingSpec,
-    ValidationError,
 )
+from httpyexpect.client.mapping import ExceptionMapping, ValidationError
 
 
 class TestException(RuntimeError):
@@ -190,3 +191,52 @@ def test_fallback_factory_validation(fallback_factory: object, is_valid: bool):
 
     with nullcontext() if is_valid else pytest.raises(ValidationError):  # type: ignore
         ExceptionMapping({}, fallback_factory=fallback_factory)  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "factory, expected_params",
+    [
+        (
+            lambda status_code, exception_id, description, data: TestException(),
+            ["status_code", "exception_id", "description", "data"],
+        ),
+        (lambda status_code, data: TestException(), ["status_code", "data"]),
+        (lambda: TestException(), []),
+    ],
+)
+def test_get_factory_kit(
+    factory: ExceptionFactory, expected_params: list[ExceptionFactoryParam]
+):
+    """Test the `get_factory_kit` method of the `ExceptionMapping` class."""
+
+    # build a spec around the provided factory:
+    status_code = 400
+    exception_id = "myTestException"
+    spec = {status_code: {exception_id: factory}}
+
+    # create an ExceptionMapping and get a factory kit:
+    mapping = ExceptionMapping(spec)
+    factory_kit = mapping.get_factory_kit(
+        status_code=status_code, exception_id=exception_id
+    )
+
+    # check the returned FactoryKit:
+    assert factory_kit.factory == factory
+    assert factory_kit.required_params == expected_params
+
+
+def test_get_factory_kit_not_existent():
+    """Test the `get_factory_kit` method of the `ExceptionMapping` class
+    when called with parameters that don't resolve to a mapping."""
+    fallback_factory = lambda status_code, data: TestException()
+    expected_params = ["status_code", "data"]
+
+    # create an ExceptionMapping and get a factory kit:
+    mapping = ExceptionMapping(spec={}, fallback_factory=fallback_factory)
+    factory_kit = mapping.get_factory_kit(
+        status_code=400, exception_id="myTestException"
+    )
+
+    # check the returned FactoryKit:
+    assert factory_kit.factory == fallback_factory
+    assert factory_kit.required_params == expected_params

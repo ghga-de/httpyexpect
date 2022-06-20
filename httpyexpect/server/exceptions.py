@@ -16,8 +16,11 @@
 
 """Exception Base models used across all servers."""
 
+import pydantic
+
 from httpyexpect.base_exception import HttpyExpectError
 from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.validation import ValidationError, check_status_code
 
 
 class HTTPException(HttpyExpectError):
@@ -49,11 +52,15 @@ class HTTPException(HttpyExpectError):
                 is required)"
         """
 
+        check_status_code(status_code)
         self.status_code = status_code
 
         # prepare a body that is validated against the httpyexpect schema:
-        self.body = HTTPExceptionBody(
-            exceptionId=exception_id, description=description, data=data
-        )
+        try:
+            self.body = HTTPExceptionBody(
+                exceptionId=exception_id, description=description, data=data
+            )
+        except pydantic.ValidationError as error:
+            raise ValidationError from error
 
         super().__init__(description)
