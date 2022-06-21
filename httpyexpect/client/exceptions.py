@@ -14,18 +14,17 @@
 # limitations under the License.
 #
 
-"""Exception Base models used across all servers."""
-
-import pydantic
+"""A collection of client-side exceptions."""
 
 from httpyexpect.base_exception import HttpyExpectError
-from httpyexpect.models import HTTPExceptionBody
-from httpyexpect.validation import ValidationError, assert_error_code
 
 
-class HTTPException(HttpyExpectError):
-    """A generic exception model that can be translated into an HTTP response according
-    to the httpyexpect exception schema.
+class UnexpectedError(HttpyExpectError):
+    """
+    Thrown when an HTTP error (originating from the server-side) could not be mapped
+    using an ExceptionMapping (see the `mapping` module).
+    (The HTTP error is, however, following the HttpyExceptionBody model as defined in
+    the `httpyexpect.models` module.)
     """
 
     def __init__(
@@ -35,7 +34,7 @@ class HTTPException(HttpyExpectError):
 
         Args:
             status_code:
-                The response code of the HTTP response to send.
+                The response code of the HTTP response.
             exception_id:
                 An identifier used to distinguish between different exception causes in
                 a preferably fine-grained fashion. The distinction between causes should
@@ -49,18 +48,40 @@ class HTTPException(HttpyExpectError):
                 An object containing further details on the exception cause in a machine
                 readable way.  All exceptions with the same exceptionId should use the
                 same set of properties here. This object may be empty (in case no data
-                is required)"
+                is required)
         """
-
-        assert_error_code(status_code)
         self.status_code = status_code
+        self.exception_id = exception_id
+        self.description = description
+        self.data = data
 
-        # prepare a body that is validated against the httpyexpect schema:
-        try:
-            self.body = HTTPExceptionBody(
-                exceptionId=exception_id, description=description, data=data
-            )
-        except pydantic.ValidationError as error:
-            raise ValidationError from error
+        message = (
+            f"Unexpected error with ID {self.exception_id} and status code"
+            + f"{self.status_code}: {self.description}"
+        )
+        super().__init__(message)
 
-        super().__init__(description)
+
+class UnstructuredError(HttpyExpectError):
+    """
+    Thrown when an HTTP error (originating from the server-side) did not comply with
+    the HttpyExceptionBody model as defined in the `httpyexpect.models` module.
+    """
+
+    def __init__(self, *, status_code: int, body: str):
+        """Initialize the error with the required metadata.
+
+        Args:
+            status_code:
+                The response code of the HTTP response.
+            body:
+                The string representation of the body shipped with the response.
+        """
+        self.status_code = status_code
+        self.body = body
+
+        message = (
+            f"An error response with status code {self.status_code} was obtained of"
+            + f" which the body did not comply with the expected schema: {self.body}"
+        )
+        super().__init__(message)

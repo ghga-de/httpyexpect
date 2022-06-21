@@ -1,4 +1,4 @@
-name: Check pydantic models generated from JSON schemas
+name: Check HTTP Exception JSON schema
 
 on: push
 
@@ -11,6 +11,6 @@ jobs:
       - id: common
         uses: ghga-de/gh-action-common@v1.0.2
 
-      - name: Check pydantic models
+      - name: Check HTTP Exception JSON schema
         run: |
-          ./scripts/update_models_from_schemas.py --check
+          ./scripts/update_http_exception_schema.py --check

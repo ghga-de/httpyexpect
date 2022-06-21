@@ -15,8 +15,11 @@
 
 """Test the base exception for servers."""
 
-from httpyexpect.models.http_exception import HttpExceptionBody  # type: ignore
+import pytest
+
+from httpyexpect.models import HTTPExceptionBody
 from httpyexpect.server import HTTPException
+from httpyexpect.validation import ValidationError
 
 
 def test_httpexception():
@@ -24,7 +27,7 @@ def test_httpexception():
 
     # example params for an http exception
     status_code = 400
-    body = HttpExceptionBody(
+    body = HTTPExceptionBody(
         exceptionId="testException",
         description="This is a test exception.",
         data={"test": "test"},
@@ -44,3 +47,30 @@ def test_httpexception():
 
     # check error message:
     assert str(exception) == body.description
+
+
+@pytest.mark.parametrize(
+    "status_code, exception_id, description, data",
+    [
+        # invalid status codes:
+        (200, "myValidExceptionID", "A valid description", {"valid": "data"}),
+        (600, "myValidExceptionID", "A valid description", {"valid": "data"}),
+        # invalid exception id:
+        (400, "123myInvalidExceptionID", "A valid description", {"valid": "data"}),
+        (400, "myInvalidExcßeptionID", "A valid description", {"valid": "data"}),
+        # invalid data:
+        (400, "myValidExceptionID", "A valid description", 123),
+    ],
+)
+def test_httpexception_invalid_params(
+    status_code: object, exception_id: object, description: object, data: object
+):
+    """Tests creating an HTTPException with invalid params."""
+
+    with pytest.raises(ValidationError):
+        HTTPException(
+            status_code=status_code,  # type: ignore
+            exception_id=exception_id,  # type: ignore
+            description=description,  # type: ignore
+            data=data,  # type: ignore
+        )
