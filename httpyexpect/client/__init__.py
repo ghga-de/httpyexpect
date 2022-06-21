@@ -17,3 +17,8 @@
 """A sub-package for translating server-side HTTP exceptions into client-side python
 exceptions.
 """
+
+
+# shortcuts:
+from httpyexpect.client.mapping import ExceptionMapping  # noqa: F401
+from httpyexpect.client.translator import ResponseTranslator  # noqa: F401
