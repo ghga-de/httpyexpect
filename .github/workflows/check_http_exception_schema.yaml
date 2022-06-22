@@ -1,0 +1,16 @@
+name: Check HTTP Exception JSON schema
+
+on: push
+
+jobs:
+  check_pydantic_models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.2
+
+      - id: common
+        uses: ghga-de/gh-action-common@v1.0.2
+
+      - name: Check HTTP Exception JSON schema
+        run: |
+          ./scripts/update_http_exception_schema.py --check

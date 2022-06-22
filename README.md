@@ -6,7 +6,7 @@
 # httpyexpect
 An opinionated way to translate server side HTTP errors to the client side.
 
-# Installation
+## Installation
 This package is available at PyPI:
 https://pypi.org/project/httpyexpect
 
@@ -18,6 +18,22 @@ pip install httpyexpect
 If you want to use the server-oriented utilities of the package, please
 install the following extra: `server`.
 
+## Client-Server Contract
+Httpyexcept proposes a client-server contract on how to communicate exceptions.
+All error responses coming from the server (i.e. all responses with a 4xx or a 5xx
+status code) should have a body that complies with the following schema:
+[](./json_schemas/http_exception.json)
+
+## Usage
+
+A detailed documentation is coming soon, until then please have a look at the
+integration tests as a usage example.
+
+[test_fastapi.py](./tests/integration/test_fastapi.py) demonstrates the server side
+usage with FastAPI.
+
+[test_client.py](./tests/integration/test_client.py) demonstrates how to translate an
+HTTP error into a Python exception on the client side.
 ## Development
 For setting up the development environment, we rely on the
 [devcontainer feature](https://code.visualstudio.com/docs/remote/containers) of vscode.
