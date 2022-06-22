@@ -20,8 +20,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from httpyexpect.client.mapping import ExceptionMapping
-from httpyexpect.client.translator import ResponseTranslator
+from httpyexpect.client import ExceptionMapping, ResponseTranslator
 from httpyexpect.models import HTTPExceptionBody
 
 

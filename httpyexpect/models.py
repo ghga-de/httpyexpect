@@ -24,7 +24,7 @@ EXCEPTION_ID_PATTERN = r"^[a-z][a-zA-Z0-9]{2,39}$"
 
 class HTTPExceptionBody(BaseModel):
     """
-    An opinionated schema for the response body shipped with HTTP exception (non 4xx
+    An opinionated schema for the response body shipped with HTTP exception (on 4xx
     or 5xx status codes).
     """
 
