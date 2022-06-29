@@ -19,7 +19,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from httpyexpect.server import HTTPException
+from httpyexpect.server import HttpException
 from httpyexpect.server.handlers.fastapi_ import configure_exception_handler
 
 
@@ -40,7 +40,7 @@ def test_configure_exception_handler():
     @app.get("/test")
     def test_route():
         """A test route function raising an httpyexpect error"""
-        raise HTTPException(
+        raise HttpException(
             status_code=status_code,
             exception_id=exception_id,
             description=description,

@@ -21,7 +21,7 @@ Handeling exceptions in FastAPI. FastAPI has to be installed.
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from httpyexpect.server.exceptions import HTTPException
+from httpyexpect.server.exceptions import HttpException
 
 
 def configure_exception_handler(app: FastAPI) -> None:
@@ -31,11 +31,11 @@ def configure_exception_handler(app: FastAPI) -> None:
         app: The FastAPI to attach the exception handler to.
     """
 
-    @app.exception_handler(HTTPException)
+    @app.exception_handler(HttpException)
     def exception_handler(
         request: Request,  # pylint: disable=unused-argument
         # (The above is required by the corresponding FastAPI interface but not used here)
-        exc: HTTPException,
+        exc: HttpException,
     ) -> JSONResponse:
         """A custom exception handler that translates httypexpect's HTTPExceptions
         into a FastAPI JSONResponse."""
