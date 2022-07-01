@@ -28,7 +28,7 @@ from httpyexpect.client.custom_types import (
 from httpyexpect.client.mapping import ExceptionMapping, ValidationError
 
 
-class TestException(RuntimeError):
+class ExampleException(RuntimeError):
     """A exception return or thrown as part of a test."""
 
     def __init__(self):
@@ -36,7 +36,7 @@ class TestException(RuntimeError):
         super().__init__()
 
 
-class TestExceptionWithArgs(RuntimeError):
+class ExampleExceptionWithArgs(RuntimeError):
     """A exception return or thrown as part of a test."""
 
     def __init__(
@@ -53,68 +53,68 @@ class TestExceptionWithArgs(RuntimeError):
         (
             {
                 400: {
-                    "myTestException0": lambda status_code, exception_id, description, data: TestException(),
-                    "myTestException1": lambda exception_id, description, data: TestException(),
-                    "myTestException2": lambda status_code, data: TestException(),
+                    "myTestException0": lambda status_code, exception_id, description, data: ExampleException(),
+                    "myTestException1": lambda exception_id, description, data: ExampleException(),
+                    "myTestException2": lambda status_code, data: ExampleException(),
                 },
                 403: {
-                    "myTestException3": lambda exception_id, description: TestException(),
-                    "myTestException4": lambda exception_id, data: TestException(),
+                    "myTestException3": lambda exception_id, description: ExampleException(),
+                    "myTestException4": lambda exception_id, data: ExampleException(),
                 },
                 404: {
-                    "myTestException5": lambda description, data: TestException(),
-                    "myTestException6": lambda exception_id: TestException(),
+                    "myTestException5": lambda description, data: ExampleException(),
+                    "myTestException6": lambda exception_id: ExampleException(),
                 },
                 427: {
-                    "myTestException7": lambda description: TestException(),
-                    "myTestException8": lambda data: TestException(),
-                    "myTestException9": lambda status_code: TestException(),
+                    "myTestException7": lambda description: ExampleException(),
+                    "myTestException8": lambda data: ExampleException(),
+                    "myTestException9": lambda status_code: ExampleException(),
                 },
                 500: {
-                    "myTestException10": lambda: TestException(),
-                    "myTestException11": TestException,
-                    "myTestException12": TestExceptionWithArgs,
+                    "myTestException10": lambda: ExampleException(),
+                    "myTestException11": ExampleException,
+                    "myTestException12": ExampleExceptionWithArgs,
                 },
             },
             True,
         ),
         # invalid status codes:
         (
-            {-100: {"myTestException": lambda exception_id: TestException()}},
+            {-100: {"myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {100: {"myTestException": lambda exception_id: TestException()}},
+            {100: {"myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {200: {"myTestException": lambda exception_id: TestException()}},
+            {200: {"myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {300: {"myTestException": lambda exception_id: TestException()}},
+            {300: {"myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {600: {"myTestException": lambda exception_id: TestException()}},
+            {600: {"myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         # invalid exception ids:
         (
-            {400: {"myTeßtException": lambda exception_id: TestException()}},
+            {400: {"myTeßtException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {400: {"1myTestException": lambda exception_id: TestException()}},
+            {400: {"1myTestException": lambda exception_id: ExampleException()}},
             False,
         ),
         (
-            {400: {"mt": lambda exception_id: TestException()}},
+            {400: {"mt": lambda exception_id: ExampleException()}},
             False,
         ),
         # invalid exception factories:
         (
-            {400: {"myTestException": TestException()}},
+            {400: {"myTestException": ExampleException()}},
             False,
         ),
         (
@@ -123,29 +123,33 @@ class TestExceptionWithArgs(RuntimeError):
         ),
         # spec is not a mapping:
         (
-            {400: lambda exception_id: TestException()},
+            {400: lambda exception_id: ExampleException()},
             False,
         ),
         # exception factory has unexpected parameters:
         (
-            {400: {"myTestException": lambda foo: TestException()}},
+            {400: {"myTestException": lambda foo: ExampleException()}},
             False,
         ),
         (
-            {400: {"myTestException": lambda exception_id, foo: TestException()}},
+            {400: {"myTestException": lambda exception_id, foo: ExampleException()}},
             False,
         ),
         (
-            {400: {"myTestException": lambda exception_id, foo="foo": TestException()}},
+            {
+                400: {
+                    "myTestException": lambda exception_id, foo="foo": ExampleException()
+                }
+            },
             False,
         ),
         # exception factory uses variadic args/kwargs (e.g. *arg **kwargs):
         (
-            {400: {"myTestException": lambda exception_id, *foo: TestException()}},
+            {400: {"myTestException": lambda exception_id, *foo: ExampleException()}},
             False,
         ),
         (
-            {400: {"myTestException": lambda exception_id, **bar: TestException()}},
+            {400: {"myTestException": lambda exception_id, **bar: ExampleException()}},
             False,
         ),
         (
@@ -156,13 +160,13 @@ class TestExceptionWithArgs(RuntimeError):
         (
             {
                 400: {
-                    "myTestException": lambda exception_id, status_code: TestException()
+                    "myTestException": lambda exception_id, status_code: ExampleException()
                 }
             },
             False,
         ),
         (
-            {400: {"myTestException": lambda data, description: TestException()}},
+            {400: {"myTestException": lambda data, description: ExampleException()}},
             False,
         ),
     ],
@@ -178,12 +182,12 @@ def test_exception_mapping_validation(spec: ExceptionMappingSpec, is_valid: bool
 @pytest.mark.parametrize(
     "fallback_factory, is_valid",
     [
-        (lambda status_code, exception_id, description, data: TestException(), True),
-        (lambda status_code, data: TestException(), True),
-        (TestExceptionWithArgs, True),
+        (lambda status_code, exception_id, description, data: ExampleException(), True),
+        (lambda status_code, data: ExampleException(), True),
+        (ExampleExceptionWithArgs, True),
         (123, False),
-        (lambda foo: TestException(), False),
-        (lambda data, description: TestException(), False),
+        (lambda foo: ExampleException(), False),
+        (lambda data, description: ExampleException(), False),
     ],
 )
 def test_fallback_factory_validation(fallback_factory: object, is_valid: bool):
@@ -197,11 +201,11 @@ def test_fallback_factory_validation(fallback_factory: object, is_valid: bool):
     "factory, expected_params",
     [
         (
-            lambda status_code, exception_id, description, data: TestException(),
+            lambda status_code, exception_id, description, data: ExampleException(),
             ["status_code", "exception_id", "description", "data"],
         ),
-        (lambda status_code, data: TestException(), ["status_code", "data"]),
-        (lambda: TestException(), []),
+        (lambda status_code, data: ExampleException(), ["status_code", "data"]),
+        (lambda: ExampleException(), []),
     ],
 )
 def test_get_factory_kit(
@@ -228,7 +232,7 @@ def test_get_factory_kit(
 def test_get_factory_kit_not_existent():
     """Test the `get_factory_kit` method of the `ExceptionMapping` class
     when called with parameters that don't resolve to a mapping."""
-    fallback_factory = lambda status_code, data: TestException()
+    fallback_factory = lambda status_code, data: ExampleException()
     expected_params = ["status_code", "data"]
 
     # create an ExceptionMapping and get a factory kit:
