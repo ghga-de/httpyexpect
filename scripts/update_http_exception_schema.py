@@ -29,7 +29,7 @@ from typing import Mapping, Sequence
 import typer
 from pydantic import BaseModel
 
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 
 REPO_ROOT_DIR = Path(__file__).parent.parent.resolve()
 JSON_SCHEMA_PATH = REPO_ROOT_DIR / "json_schemas" / "http_exception.json"
@@ -135,13 +135,13 @@ def main(
 
     if check:
         try:
-            check_json_schema(schema_path=JSON_SCHEMA_PATH, model=HTTPExceptionBody)
+            check_json_schema(schema_path=JSON_SCHEMA_PATH, model=HttpExceptionBody)
         except ValidationError as error:
             typer.secho(str(error), fg=typer.colors.RED)
             sys.exit(1)
         typer.secho("The JSON schema is up to date.", fg=typer.colors.GREEN)
     else:
-        updates_json_schema(schema_path=JSON_SCHEMA_PATH, model=HTTPExceptionBody)
+        updates_json_schema(schema_path=JSON_SCHEMA_PATH, model=HttpExceptionBody)
         typer.secho("Successfully updated the JSON schema.", fg=typer.colors.GREEN)
 
 

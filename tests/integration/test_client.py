@@ -21,7 +21,7 @@ from unittest.mock import Mock
 import pytest
 
 from httpyexpect.client import ExceptionMapping, ResponseTranslator
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 
 
 class ExceptionA(RuntimeError):
@@ -41,21 +41,21 @@ class ExceptionC(RuntimeError):
     [
         (
             400,
-            HTTPExceptionBody(
+            HttpExceptionBody(
                 exceptionId="testA", description="test", data={"test": "test"}
             ),
             ExceptionA,
         ),
         (
             400,
-            HTTPExceptionBody(
+            HttpExceptionBody(
                 exceptionId="testB", description="test", data={"test": "test"}
             ),
             ExceptionB,
         ),
         (
             500,
-            HTTPExceptionBody(
+            HttpExceptionBody(
                 exceptionId="testC", description="test", data={"test": "test"}
             ),
             ExceptionC,
@@ -63,7 +63,7 @@ class ExceptionC(RuntimeError):
     ],
 )
 def test_typical_client_usage(
-    status_code: int, body: HTTPExceptionBody, expected_exception: type[Exception]
+    status_code: int, body: HttpExceptionBody, expected_exception: type[Exception]
 ):
     """Test the typical way how the client may use the `ResponseTranslator` together
     with the `ExceptionMapping` classes."""

@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "description": "An opinionated schema for the response body shipped with HTTP exception (on 4xx\nor 5xx status codes).",
+  "description": "An opinionated base schema/model for the response body shipped with HTTP exception\n(on 4xx or 5xx status codes).",
   "properties": {
     "data": {
       "description": "An object containing further details on the exception cause in a machine readable way. All exceptions with the same exceptionId should use the same set of properties here. This object may be empty (in case no data is required)",
@@ -24,6 +24,6 @@
     "description",
     "exceptionId"
   ],
-  "title": "HTTPExceptionBody",
+  "title": "HttpExceptionBody",
   "type": "object"
 }

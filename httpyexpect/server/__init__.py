@@ -19,4 +19,7 @@ server side.
 """
 
 # shortcuts:
-from httpyexpect.server.exceptions import HTTPException  # noqa: F401
+from httpyexpect.server.exceptions import (  # noqa: F401
+    HttpCustomExceptionBase,
+    HttpException,
+)

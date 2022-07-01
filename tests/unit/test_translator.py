@@ -24,7 +24,7 @@ import pytest
 from httpyexpect.client.exceptions import UnstructuredError
 from httpyexpect.client.mapping import EXCEPTION_FACTORY_PARAMS, FactoryKit
 from httpyexpect.client.translator import ResponseTranslator
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 
 
 class TestException(RuntimeError):
@@ -96,7 +96,7 @@ def test_response_translator_error(case: Case):
     )
 
     # create http response mock:
-    body = HTTPExceptionBody(
+    body = HttpExceptionBody(
         exceptionId=case.exception_id, description=case.description, data=case.data
     )
     response = Mock()

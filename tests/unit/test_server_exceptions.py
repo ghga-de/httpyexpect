@@ -15,26 +15,35 @@
 
 """Test the base exception for servers."""
 
+import pydantic
 import pytest
 
-from httpyexpect.models import HTTPExceptionBody
-from httpyexpect.server import HTTPException
+from httpyexpect.models import HttpExceptionBody
+from httpyexpect.server import HttpCustomExceptionBase, HttpException
 from httpyexpect.validation import ValidationError
 
 
-def test_httpexception():
+class MyCustomHttpException(HttpCustomExceptionBase):
+    exception_id = "myHttpException"
+
+    class DataModel(pydantic.BaseModel):
+        some_param: str
+        another_param: int
+
+
+def test_http_exception():
     """Tests the interface and behavior of HTTPException instances."""
 
     # example params for an http exception
     status_code = 400
-    body = HTTPExceptionBody(
+    body = HttpExceptionBody(
         exceptionId="testException",
         description="This is a test exception.",
         data={"test": "test"},
     )
 
     # create an exception:
-    exception = HTTPException(
+    exception = HttpException(
         status_code=status_code,
         exception_id=body.exceptionId,
         description=body.description,
@@ -62,15 +71,92 @@ def test_httpexception():
         (400, "myValidExceptionID", "A valid description", 123),
     ],
 )
-def test_httpexception_invalid_params(
+def test_http_exception_invalid_params(
     status_code: object, exception_id: object, description: object, data: object
 ):
     """Tests creating an HTTPException with invalid params."""
 
     with pytest.raises(ValidationError):
-        HTTPException(
+        HttpException(
             status_code=status_code,  # type: ignore
             exception_id=exception_id,  # type: ignore
+            description=description,  # type: ignore
+            data=data,  # type: ignore
+        )
+
+
+def test_http_custom_exception():
+    """Tests the interface and behavior of instances of subclasses of the
+    HttpCustomExceptionBase."""
+
+    # example params for an http exception
+    status_code = 400
+    body = HttpExceptionBody(
+        exceptionId=MyCustomHttpException.exception_id,
+        description="This is a test exception.",
+        data={"some_param": "data", "another_param": 123},
+    )
+
+    # create an exception:
+    exception = MyCustomHttpException(
+        status_code=status_code,
+        description=body.description,
+        data=body.data,
+    )
+
+    # check public attributes:
+    assert exception.body == body
+    assert exception.status_code == status_code
+
+    # check error message:
+    assert str(exception) == body.description
+
+
+def test_http_custom_exception_body():
+    """Tests the interface and behavior of HttpCustomExceptionBase instances."""
+
+    body_model = MyCustomHttpException.get_body_model()
+    assert issubclass(body_model, pydantic.BaseModel)
+
+    # evaluate the schema:
+    body_schema = body_model.schema()
+    assert set(body_schema["properties"].keys()) == {
+        "data",
+        "description",
+        "exceptionId",
+    }
+
+    exception_id_schema = body_schema["properties"]["exceptionId"]
+    assert exception_id_schema["type"] == "string"
+    assert "enum" in exception_id_schema
+    assert exception_id_schema["enum"][0] == MyCustomHttpException.exception_id
+
+    assert "$ref" in body_schema["properties"]["data"]
+    data_definition_name = body_schema["properties"]["data"]["$ref"].split("/")[-1]
+    data_definition = body_schema["definitions"][data_definition_name]
+    assert data_definition["type"] == "object"
+    assert set(data_definition["properties"].keys()) == {"some_param", "another_param"}
+
+
+@pytest.mark.parametrize(
+    "status_code, description, data",
+    [
+        # invalid status codes:
+        (200, "A valid description", {"some_param": "data", "another_param": 123}),
+        (600, "A valid description", {"some_param": "data", "another_param": 123}),
+        # invalid data:
+        (400, "A valid description", {}),
+        (400, "A valid description", {"some_random_param": "data"}),
+    ],
+)
+def test_http_custom_exception_invalid_params(
+    status_code: object, description: object, data: object
+):
+    """Tests the interface and behavior of HttpCustomExceptionBase instances."""
+
+    with pytest.raises(ValidationError):
+        MyCustomHttpException(
+            status_code=status_code,  # type: ignore
             description=description,  # type: ignore
             data=data,  # type: ignore
         )
