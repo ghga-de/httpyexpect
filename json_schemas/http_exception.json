@@ -24,6 +24,6 @@
     "description",
     "exceptionId"
   ],
-  "title": "HTTPExceptionBody",
+  "title": "HttpExceptionBody",
   "type": "object"
 }

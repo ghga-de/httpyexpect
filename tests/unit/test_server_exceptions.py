@@ -18,7 +18,7 @@
 import pydantic
 import pytest
 
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 from httpyexpect.server import HttpCustomExceptionBase, HttpException
 from httpyexpect.validation import ValidationError
 
@@ -36,7 +36,7 @@ def test_http_exception():
 
     # example params for an http exception
     status_code = 400
-    body = HTTPExceptionBody(
+    body = HttpExceptionBody(
         exceptionId="testException",
         description="This is a test exception.",
         data={"test": "test"},
@@ -91,7 +91,7 @@ def test_http_custom_exception():
 
     # example params for an http exception
     status_code = 400
-    body = HTTPExceptionBody(
+    body = HttpExceptionBody(
         exceptionId=MyCustomHttpException.exception_id,
         description="This is a test exception.",
         data={"some_param": "data", "another_param": 123},

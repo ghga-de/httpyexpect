@@ -22,7 +22,7 @@ from typing import Literal
 import pydantic
 
 from httpyexpect.base_exception import HttpyExpectError
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 from httpyexpect.validation import ValidationError, assert_error_code
 
 
@@ -60,7 +60,7 @@ class HttpException(HttpyExpectError):
 
         # prepare a body that is validated against the httpyexpect schema:
         try:
-            self.body = HTTPExceptionBody(
+            self.body = HttpExceptionBody(
                 exceptionId=exception_id, description=description, data=data
             )
         except pydantic.ValidationError as error:
@@ -135,7 +135,7 @@ class HttpCustomExceptionBase(ABC, HttpException):
         data_model.__name__ = data_model_name
         data_model.Config.title = data_model_name  # type: ignore
 
-        class CustomBodyModel(HTTPExceptionBody):
+        class CustomBodyModel(HttpExceptionBody):
             """A custom exception body model."""
 
             exceptionId: Literal[cls.exception_id]  # type: ignore

@@ -21,7 +21,7 @@ from contextlib import nullcontext
 import pytest
 from pydantic import ValidationError
 
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 
 
 @pytest.mark.parametrize(
@@ -51,4 +51,4 @@ def test_http_exception_body(
     """Test validation logic of the HTTPExceptionBody model."""
 
     with nullcontext() if is_valid else pytest.raises(ValidationError):  # type: ignore
-        HTTPExceptionBody(exceptionId=exceptionId, description=description, data=data)
+        HttpExceptionBody(exceptionId=exceptionId, description=description, data=data)

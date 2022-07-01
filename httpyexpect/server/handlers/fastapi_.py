@@ -25,7 +25,7 @@ from httpyexpect.server.exceptions import HttpException
 
 
 def configure_exception_handler(app: FastAPI) -> None:
-    """Configure an FastAPI app to handle httypexpect's HTTPExceptions.
+    """Configure an FastAPI app to handle httypexpect's HttpExceptions.
 
     Args:
         app: The FastAPI to attach the exception handler to.
@@ -37,6 +37,6 @@ def configure_exception_handler(app: FastAPI) -> None:
         # (The above is required by the corresponding FastAPI interface but not used here)
         exc: HttpException,
     ) -> JSONResponse:
-        """A custom exception handler that translates httypexpect's HTTPExceptions
+        """A custom exception handler that translates httypexpect's HttpExceptions
         into a FastAPI JSONResponse."""
         return JSONResponse(status_code=exc.status_code, content=exc.body.dict())

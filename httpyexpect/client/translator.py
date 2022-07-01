@@ -23,7 +23,7 @@ import requests
 
 from httpyexpect.client.exceptions import UnstructuredError
 from httpyexpect.client.mapping import ExceptionMapping
-from httpyexpect.models import HTTPExceptionBody
+from httpyexpect.models import HttpExceptionBody
 from httpyexpect.validation import ValidationError, assert_error_code
 
 
@@ -46,11 +46,11 @@ class ResponseTranslator:
         self._response = response
 
     @staticmethod
-    def _get_validated_exception_body(response: requests.Response) -> HTTPExceptionBody:
+    def _get_validated_exception_body(response: requests.Response) -> HttpExceptionBody:
         """Validates the response body against the HttpyExceptionBody model"""
         body = response.json()
         try:
-            return HTTPExceptionBody(**body)
+            return HttpExceptionBody(**body)
         except pydantic.ValidationError as error:
             raise UnstructuredError(
                 status_code=response.status_code, body=body

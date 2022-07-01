@@ -22,7 +22,7 @@ from pydantic import BaseModel, Extra, Field, constr
 EXCEPTION_ID_PATTERN = r"^[a-z][a-zA-Z0-9]{2,39}$"
 
 
-class HTTPExceptionBody(BaseModel):
+class HttpExceptionBody(BaseModel):
     """
     An opinionated base schema/model for the response body shipped with HTTP exception
     (on 4xx or 5xx status codes).
