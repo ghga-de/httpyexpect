@@ -27,7 +27,7 @@ from httpyexpect.client.translator import ResponseTranslator
 from httpyexpect.models import HttpExceptionBody
 
 
-class TestException(RuntimeError):
+class ExampleException(RuntimeError):
     """A exception that save all its input params."""
 
     def __init__(self, *params):
@@ -56,7 +56,7 @@ class Case(NamedTuple):
             exception_id="myTestException",
             description="Test error.",
             data={"test": "test"},
-            exception_factory=lambda status_code, exception_id, description, data: TestException(
+            exception_factory=lambda status_code, exception_id, description, data: ExampleException(
                 status_code, exception_id, description, data
             ),
             required_params=EXCEPTION_FACTORY_PARAMS,
@@ -67,7 +67,7 @@ class Case(NamedTuple):
             exception_id="myTestException",
             description="Test error.",
             data={"test": "test"},
-            exception_factory=lambda status_code, data: TestException(
+            exception_factory=lambda status_code, data: ExampleException(
                 status_code, data
             ),
             required_params=["status_code", "data"],
@@ -87,7 +87,7 @@ def test_response_translator_error(case: Case):
     required_param_values = [
         value for key, value in all_params.items() if key in case.required_params
     ]
-    expected_exception = TestException(*required_param_values)
+    expected_exception = ExampleException(*required_param_values)
 
     # create exception mapping mock:
     exception_map = Mock()
@@ -108,11 +108,11 @@ def test_response_translator_error(case: Case):
 
     # translate and get the python exception object:
     obtained_exception = translator.get_error()
-    assert isinstance(obtained_exception, TestException)
+    assert isinstance(obtained_exception, ExampleException)
     assert obtained_exception.params == expected_exception.params
 
     # translate into python exception and raise it:
-    with pytest.raises(TestException):
+    with pytest.raises(ExampleException):
         translator.raise_for_error()
 
 

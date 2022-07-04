@@ -108,6 +108,8 @@ class HttpCustomExceptionBase(ABC, HttpException):
                 is required)"
         """
 
+        self._check_data_model_cls()
+
         # validate the data against the custom model:
         try:
             self.DataModel(**data)
@@ -124,22 +126,32 @@ class HttpCustomExceptionBase(ABC, HttpException):
         )
 
     @classmethod
+    def _check_data_model_cls(cls):
+        """Makes sure that the DataModel class has the right base."""
+
+        if not issubclass(cls.DataModel, pydantic.BaseModel):
+            raise TypeError("The DataModel is not a subclass of pydantic's BaseModel.")
+
+    @classmethod
     def get_body_model(cls):
         """Creates and returns a custom pydantic model describing the exception body."""
 
+        cls._check_data_model_cls()
+
         body_model_name = cls.__name__
 
-        # derive and set the name of the exception data model:
+        # derive the name of the exception data model:
         data_model_name = f"{body_model_name}Data"
-        data_model = cls.DataModel
-        data_model.__name__ = data_model_name
-        data_model.Config.title = data_model_name  # type: ignore
+
+        # customize the class name by subclassing:
+        named_data_model = type(data_model_name, (cls.DataModel,), {})
+        named_data_model.Config.title = data_model_name  # type: ignore
 
         class CustomBodyModel(HttpExceptionBody):
             """A custom exception body model."""
 
             exceptionId: Literal[cls.exception_id]  # type: ignore
-            data: data_model  # type: ignore
+            data: named_data_model  # type: ignore
 
             class Config:
                 """Configure Model."""
@@ -147,6 +159,7 @@ class HttpCustomExceptionBase(ABC, HttpException):
                 extra = pydantic.Extra.forbid
                 titel = body_model_name
 
-        CustomBodyModel.__name__ = data_model_name
+        # customize the class name by subclassing:
+        named_custom_model = type(body_model_name, (CustomBodyModel,), {})
 
-        return CustomBodyModel
+        return named_custom_model
