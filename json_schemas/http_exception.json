@@ -3,7 +3,7 @@
   "description": "An opinionated base schema/model for the response body shipped with HTTP exception\n(on 4xx or 5xx status codes).",
   "properties": {
     "data": {
-      "description": "An object containing further details on the exception cause in a machine readable way. All exceptions with the same exceptionId should use the same set of properties here. This object may be empty (in case no data is required)",
+      "description": "An object containing further details on the exception cause in a machine readable way. All exceptions with the same exception_id should use the same set of properties here. This object may be empty (in case no data is required)",
       "title": "Data",
       "type": "object"
     },
@@ -12,17 +12,17 @@
       "title": "Description",
       "type": "string"
     },
-    "exceptionId": {
+    "exception_id": {
       "description": "An identifier used to distinguish between different exception causes in a preferably fine-grained fashion. The distinction between causes should be made from the perspective of the server/service raising the exception (and not from the client perspective). Needs to be camel case formatted and 3-40 character in length.",
       "pattern": "^[a-z][a-zA-Z0-9]{2,39}$",
-      "title": "Exceptionid",
+      "title": "Exception Id",
       "type": "string"
     }
   },
   "required": [
     "data",
     "description",
-    "exceptionId"
+    "exception_id"
   ],
   "title": "HttpExceptionBody",
   "type": "object"

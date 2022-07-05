@@ -25,7 +25,7 @@ from httpyexpect.models import HttpExceptionBody
 
 
 @pytest.mark.parametrize(
-    "exceptionId, description, data, is_valid",
+    "exception_id, description, data, is_valid",
     [
         ("testException1", "My test description.", {"test": "test"}, True),
         # Id starts with number:
@@ -46,9 +46,9 @@ from httpyexpect.models import HttpExceptionBody
     ],
 )
 def test_http_exception_body(
-    exceptionId: str, description: str, data: dict, is_valid: bool
+    exception_id: str, description: str, data: dict, is_valid: bool
 ):
     """Test validation logic of the HTTPExceptionBody model."""
 
     with nullcontext() if is_valid else pytest.raises(ValidationError):  # type: ignore
-        HttpExceptionBody(exceptionId=exceptionId, description=description, data=data)
+        HttpExceptionBody(exception_id=exception_id, description=description, data=data)

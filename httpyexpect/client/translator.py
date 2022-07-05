@@ -68,13 +68,13 @@ class ResponseTranslator:
         # get a factory kit that ships the exception factory together with instructions
         # on how to use it:
         factory_kit = exception_map.get_factory_kit(
-            status_code=response.status_code, exception_id=body.exceptionId
+            status_code=response.status_code, exception_id=body.exception_id
         )
 
         # assembled the required parameter values:
         param_values = {
             "status_code": response.status_code,
-            "exception_id": body.exceptionId,
+            "exception_id": body.exception_id,
             "description": body.description,
             "data": body.data,
         }
