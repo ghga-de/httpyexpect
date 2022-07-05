@@ -3,7 +3,7 @@
   "description": "An opinionated base schema/model for the response body shipped with HTTP exception\n(on 4xx or 5xx status codes).",
   "properties": {
     "data": {
-      "description": "An object containing further details on the exception cause in a machine readable way. All exceptions with the same exceptionId should use the same set of properties here. This object may be empty (in case no data is required)",
+      "description": "An object containing further details on the exception cause in a machine readable way. All exceptions with the same exception_id should use the same set of properties here. This object may be empty (in case no data is required)",
       "title": "Data",
       "type": "object"
     },

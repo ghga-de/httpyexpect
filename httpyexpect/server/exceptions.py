@@ -50,7 +50,7 @@ class HttpException(HttpyExpectError):
                 exception.
             data:
                 An object containing further details on the exception cause in a machine
-                readable way.  All exceptions with the same exceptionId should use the
+                readable way.  All exceptions with the same exception_id should use the
                 same set of properties here. This object may be empty (in case no data
                 is required)"
         """
@@ -61,7 +61,7 @@ class HttpException(HttpyExpectError):
         # prepare a body that is validated against the httpyexpect schema:
         try:
             self.body = HttpExceptionBody(
-                exceptionId=exception_id, description=description, data=data
+                exception_id=exception_id, description=description, data=data
             )
         except pydantic.ValidationError as error:
             raise ValidationError(
@@ -103,7 +103,7 @@ class HttpCustomExceptionBase(ABC, HttpException):
                 exception.
             data:
                 An object containing further details on the exception cause in a machine
-                readable way.  All exceptions with the same exceptionId should use the
+                readable way.  All exceptions with the same exception_id should use the
                 same set of properties here. This object may be empty (in case no data
                 is required)"
         """
@@ -150,7 +150,7 @@ class HttpCustomExceptionBase(ABC, HttpException):
         class CustomBodyModel(HttpExceptionBody):
             """A custom exception body model."""
 
-            exceptionId: Literal[cls.exception_id]  # type: ignore
+            exception_id: Literal[cls.exception_id]  # type: ignore
             data: named_data_model  # type: ignore
 
             class Config:

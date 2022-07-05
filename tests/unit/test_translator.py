@@ -97,7 +97,7 @@ def test_response_translator_error(case: Case):
 
     # create http response mock:
     body = HttpExceptionBody(
-        exceptionId=case.exception_id, description=case.description, data=case.data
+        exception_id=case.exception_id, description=case.description, data=case.data
     )
     response = Mock()
     response.status_code = case.status_code

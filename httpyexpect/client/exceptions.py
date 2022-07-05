@@ -46,7 +46,7 @@ class UnexpectedError(HttpyExpectError):
                 exception.
             data:
                 An object containing further details on the exception cause in a machine
-                readable way.  All exceptions with the same exceptionId should use the
+                readable way.  All exceptions with the same exception_id should use the
                 same set of properties here. This object may be empty (in case no data
                 is required)
         """
