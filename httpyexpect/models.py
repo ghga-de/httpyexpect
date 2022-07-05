@@ -49,7 +49,7 @@ class HttpExceptionBody(BaseModel):
             + " exception."
         ),
     )
-    exceptionId: constr(regex=EXCEPTION_ID_PATTERN) = Field(  # type: ignore
+    exception_id: constr(regex=EXCEPTION_ID_PATTERN) = Field(  # type: ignore
         ...,
         description=(
             "An identifier used to distinguish between different exception"
