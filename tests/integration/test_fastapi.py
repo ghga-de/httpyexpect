@@ -54,6 +54,6 @@ def test_configure_exception_handler():
     # check if the response matches the expectation:
     assert response.status_code == status_code
     body = response.json()
-    assert body["exceptionId"] == exception_id
+    assert body["exception_id"] == exception_id
     assert body["description"] == description
     assert body["data"] == data

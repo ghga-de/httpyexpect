@@ -42,21 +42,21 @@ class ExceptionC(RuntimeError):
         (
             400,
             HttpExceptionBody(
-                exceptionId="testA", description="test", data={"test": "test"}
+                exception_id="testA", description="test", data={"test": "test"}
             ),
             ExceptionA,
         ),
         (
             400,
             HttpExceptionBody(
-                exceptionId="testB", description="test", data={"test": "test"}
+                exception_id="testB", description="test", data={"test": "test"}
             ),
             ExceptionB,
         ),
         (
             500,
             HttpExceptionBody(
-                exceptionId="testC", description="test", data={"test": "test"}
+                exception_id="testC", description="test", data={"test": "test"}
             ),
             ExceptionC,
         ),

@@ -37,7 +37,7 @@ def test_http_exception():
     # example params for an http exception
     status_code = 400
     body = HttpExceptionBody(
-        exceptionId="testException",
+        exception_id="testException",
         description="This is a test exception.",
         data={"test": "test"},
     )
@@ -45,7 +45,7 @@ def test_http_exception():
     # create an exception:
     exception = HttpException(
         status_code=status_code,
-        exception_id=body.exceptionId,
+        exception_id=body.exception_id,
         description=body.description,
         data=body.data,
     )
@@ -92,7 +92,7 @@ def test_http_custom_exception():
     # example params for an http exception
     status_code = 400
     body = HttpExceptionBody(
-        exceptionId=MyCustomHttpException.exception_id,
+        exception_id=MyCustomHttpException.exception_id,
         description="This is a test exception.",
         data={"some_param": "data", "another_param": 123},
     )
@@ -123,10 +123,10 @@ def test_http_custom_exception_body():
     assert set(body_schema["properties"].keys()) == {
         "data",
         "description",
-        "exceptionId",
+        "exception_id",
     }
 
-    exception_id_schema = body_schema["properties"]["exceptionId"]
+    exception_id_schema = body_schema["properties"]["exception_id"]
     assert exception_id_schema["type"] == "string"
     assert "enum" in exception_id_schema
     assert exception_id_schema["enum"][0] == MyCustomHttpException.exception_id
