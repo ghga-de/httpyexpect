@@ -145,7 +145,6 @@ class HttpCustomExceptionBase(ABC, HttpException):
 
         # customize the class name by subclassing:
         named_data_model = type(data_model_name, (cls.DataModel,), {})
-        named_data_model.Config.title = data_model_name  # type: ignore
 
         class CustomBodyModel(HttpExceptionBody):
             """A custom exception body model."""
@@ -157,7 +156,6 @@ class HttpCustomExceptionBase(ABC, HttpException):
                 """Configure Model."""
 
                 extra = pydantic.Extra.forbid
-                title = body_model_name
 
         # customize the class name by subclassing:
         named_custom_model = type(body_model_name, (CustomBodyModel,), {})

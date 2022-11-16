@@ -15,4 +15,4 @@
 
 """An opinionated way to translate server side HTTP errors to the client side."""
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
