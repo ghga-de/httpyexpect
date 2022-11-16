@@ -157,7 +157,7 @@ class HttpCustomExceptionBase(ABC, HttpException):
                 """Configure Model."""
 
                 extra = pydantic.Extra.forbid
-                titel = body_model_name
+                title = body_model_name
 
         # customize the class name by subclassing:
         named_custom_model = type(body_model_name, (CustomBodyModel,), {})
