@@ -14,12 +14,4 @@
 # limitations under the License.
 #
 
-"""Custom types and type aliases."""
-
-from typing import Callable, Literal, Mapping
-
-ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "data"]
-StatusCode = int
-ExceptionId = str
-ExceptionFactory = Callable[..., Exception]
-ExceptionMappingSpec = Mapping[StatusCode, object]
+"""A collection of utilities used by scripts."""

@@ -1,14 +1,21 @@
-version: "3"
+version: '3'
 
 services:
-  httpyexpect:
+  app:
     build:
       context: .
       dockerfile: ./Dockerfile
-
       args:
         # [Choice] Python version: 3, 3.8, 3.7, 3.6
         VARIANT: 3.9
+        # [Choice] Install Node.js
+        INSTALL_NODE: "true"
+        NODE_VERSION: "lts/*"
+        # Please adapt to package name:
+        PACKAGE_NAME: "httpyexpect"
+        # On Linux, you may need to update USER_UID and USER_GID below if not your local UID is not 1000.
+        USER_UID: 1000
+        USER_GID: 1000
 
     init: true
     privileged: true
@@ -16,12 +23,17 @@ services:
     volumes:
       - ..:/workspace:cached
 
-    environment: {}
-
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
     # Uncomment the next line to use a non-root user for all processes.
     user: vscode
 
-volumes: {}
+    # define environment variables
+    environment:
+      # Please adapt to package name:
+      HTTPYEXPECT_CONFIG_YAML: /workspace/.devcontainer/.dev_config.yaml
+
+volumes:
+  s3_fs: {}
+  mongo_fs: {}

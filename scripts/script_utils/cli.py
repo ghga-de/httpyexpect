@@ -14,12 +14,23 @@
 # limitations under the License.
 #
 
-"""Custom types and type aliases."""
+"""A collection of CLI utilities"""
 
-from typing import Callable, Literal, Mapping
+import typer
 
-ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "data"]
-StatusCode = int
-ExceptionId = str
-ExceptionFactory = Callable[..., Exception]
-ExceptionMappingSpec = Mapping[StatusCode, object]
+
+def echo_success(message: str):
+    """Print a success message."""
+
+    styled_message = typer.style(text=message, fg=typer.colors.GREEN)
+    typer.echo(styled_message)
+
+
+def echo_failure(message: str):
+    """Print a failure message."""
+
+    styled_message = typer.style(text=message, fg=typer.colors.RED)
+    typer.echo(styled_message)
+
+
+run = typer.run
