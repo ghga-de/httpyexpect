@@ -1,0 +1,6 @@
+# Optional list of files which are actually mandatory in the template
+# but are allowed to be removed in the current repository
+Dockerfile
+config_schema.json
+example_config.yaml
+example_data

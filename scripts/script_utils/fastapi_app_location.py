@@ -14,12 +14,10 @@
 # limitations under the License.
 #
 
-"""Custom types and type aliases."""
+"""Used to define the location of the main FastAPI app object."""
 
-from typing import Callable, Literal, Mapping
+# flake8: noqa
+# pylint: skip-file
 
-ExceptionFactoryParam = Literal["status_code", "exception_id", "description", "data"]
-StatusCode = int
-ExceptionId = str
-ExceptionFactory = Callable[..., Exception]
-ExceptionMappingSpec = Mapping[StatusCode, object]
+# Please adapt to package structure:
+from my_microservice.api.main import app
