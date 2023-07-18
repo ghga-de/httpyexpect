@@ -16,9 +16,8 @@
 
 """Logic to translate responses to HTTP calls to python exceptions."""
 
-from typing import Optional
+from typing import Any, Optional, Protocol
 
-import httpx
 import pydantic
 
 from httpyexpect.client.exceptions import UnstructuredError
@@ -27,16 +26,28 @@ from httpyexpect.models import HttpExceptionBody
 from httpyexpect.validation import ValidationError, assert_error_code
 
 
+class Response(Protocol):
+    """Any Response that is compatible with httpx and requests."""
+
+    status_code: int
+    """The status code or the Response"""
+
+    def json(self, **kwargs: Any) -> Any:
+        """JSON representation of the Response."""
+        ...
+
+
 class ResponseTranslator:
     """Translates a specific response to an HTTP call using an ExceptionMapping to
     python exceptions (in case of an error code)."""
 
-    def __init__(self, response: httpx.Response, *, exception_map: ExceptionMapping):
+    def __init__(self, response: Response, *, exception_map: ExceptionMapping):
         """Initialize the translator.
 
         Args:
             response:
-                A response to an HTTP call performed with the `httpx` library.
+                A response to an HTTP call performed e.g. with the `httpx` or `requests`
+                library.
             exception_map:
                 An exception mapping specifying translations between status codes plus
                 exception IDs and python exceptions.
@@ -46,7 +57,7 @@ class ResponseTranslator:
         self._response = response
 
     @staticmethod
-    def _get_validated_exception_body(response: httpx.Response) -> HttpExceptionBody:
+    def _get_validated_exception_body(response: Response) -> HttpExceptionBody:
         """Validates the response body against the HttpyExceptionBody model"""
         body = response.json()
         try:
@@ -58,7 +69,7 @@ class ResponseTranslator:
 
     @classmethod
     def _construct_exception(
-        cls, response: httpx.Response, exception_map: ExceptionMapping
+        cls, response: Response, exception_map: ExceptionMapping
     ) -> Exception:
         """Construct a python exception from a response."""
 
