@@ -29,8 +29,8 @@ class Response(Protocol):
     """Any Response that is compatible with httpx and requests."""
 
     status_code: int
-    """The status code or the Response"""
+    """Status code of the Response"""
 
     def json(self, **kwargs: Any) -> Any:
-        """JSON representation of the Response."""
+        """JSON representation of the Response"""
         ...
