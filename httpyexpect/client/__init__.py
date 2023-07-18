@@ -20,5 +20,6 @@ exceptions.
 
 
 # shortcuts:
+from httpyexpect.client.custom_types import Response  # noqa: F401
 from httpyexpect.client.mapping import ExceptionMapping  # noqa: F401
 from httpyexpect.client.translator import ResponseTranslator  # noqa: F401

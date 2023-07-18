@@ -16,25 +16,15 @@
 
 """Logic to translate responses to HTTP calls to python exceptions."""
 
-from typing import Any, Optional, Protocol
+from typing import Optional
 
 import pydantic
 
+from httpyexpect.client.custom_types import Response
 from httpyexpect.client.exceptions import UnstructuredError
 from httpyexpect.client.mapping import ExceptionMapping
 from httpyexpect.models import HttpExceptionBody
 from httpyexpect.validation import ValidationError, assert_error_code
-
-
-class Response(Protocol):
-    """Any Response that is compatible with httpx and requests."""
-
-    status_code: int
-    """The status code or the Response"""
-
-    def json(self, **kwargs: Any) -> Any:
-        """JSON representation of the Response."""
-        ...
 
 
 class ResponseTranslator:
