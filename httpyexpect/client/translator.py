@@ -19,8 +19,8 @@
 from typing import Optional
 
 import pydantic
-import requests
 
+from httpyexpect.client.custom_types import Response
 from httpyexpect.client.exceptions import UnstructuredError
 from httpyexpect.client.mapping import ExceptionMapping
 from httpyexpect.models import HttpExceptionBody
@@ -31,12 +31,13 @@ class ResponseTranslator:
     """Translates a specific response to an HTTP call using an ExceptionMapping to
     python exceptions (in case of an error code)."""
 
-    def __init__(self, response: requests.Response, *, exception_map: ExceptionMapping):
+    def __init__(self, response: Response, *, exception_map: ExceptionMapping):
         """Initialize the translator.
 
         Args:
             response:
-                A response to an HTTP call performed with the `requests` library.
+                A response to an HTTP call performed e.g. with the `httpx` or `requests`
+                library.
             exception_map:
                 An exception mapping specifying translations between status codes plus
                 exception IDs and python exceptions.
@@ -46,7 +47,7 @@ class ResponseTranslator:
         self._response = response
 
     @staticmethod
-    def _get_validated_exception_body(response: requests.Response) -> HttpExceptionBody:
+    def _get_validated_exception_body(response: Response) -> HttpExceptionBody:
         """Validates the response body against the HttpyExceptionBody model"""
         body = response.json()
         try:
@@ -58,7 +59,7 @@ class ResponseTranslator:
 
     @classmethod
     def _construct_exception(
-        cls, response: requests.Response, exception_map: ExceptionMapping
+        cls, response: Response, exception_map: ExceptionMapping
     ) -> Exception:
         """Construct a python exception from a response."""
 

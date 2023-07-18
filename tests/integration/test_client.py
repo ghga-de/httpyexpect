@@ -16,11 +16,12 @@
 
 """Client-side integration tests."""
 
+from io import BytesIO
 from unittest.mock import Mock
 
 import pytest
 
-from httpyexpect.client import ExceptionMapping, ResponseTranslator
+from httpyexpect.client import ExceptionMapping, Response, ResponseTranslator
 from httpyexpect.models import HttpExceptionBody
 
 
@@ -93,3 +94,27 @@ def test_typical_client_usage(
     # translate into python exception and raise it:
     with pytest.raises(expected_exception):
         translator.raise_for_error()
+
+
+def test_compatibility_with_httpx():
+    """Make sure that our Response protocol is compatible with the httpx library."""
+    # pylint: disable=import-outside-toplevel
+    from httpx import Response as HttpxResponse
+
+    httpx_response = HttpxResponse(status_code=200, content=b'{"hello": "world"}')
+    response: Response = httpx_response  # mypy should not complain here
+    assert response.status_code == 200
+    assert response.json() == {"hello": "world"}
+
+
+def test_compatibility_with_requests():
+    """Make sure that our Response protocol is compatible with the requests library."""
+    # pylint: disable=import-outside-toplevel
+    from requests import Response as RequestsResponse
+
+    requests_response = RequestsResponse()
+    requests_response.status_code = 200
+    requests_response.raw = BytesIO(b'{"hello": "world"}')
+    response: Response = requests_response  # mypy should not complain here
+    assert response.status_code == 200
+    assert response.json() == {"hello": "world"}

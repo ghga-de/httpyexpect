@@ -14,12 +14,4 @@
 # limitations under the License.
 #
 
-"""A sub-package for translating server-side HTTP exceptions into client-side python
-exceptions.
-"""
-
-
-# shortcuts:
-from httpyexpect.client.custom_types import Response  # noqa: F401
-from httpyexpect.client.mapping import ExceptionMapping  # noqa: F401
-from httpyexpect.client.translator import ResponseTranslator  # noqa: F401
+"""Scripts and utils used during development or in CI pipelines."""
